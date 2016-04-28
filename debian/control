@@ -1,0 +1,12 @@
+Source: inxi-gui-antix
+Section: system
+Priority: optional
+Maintainer: anticapitalista <antix@operamail.com>
+Build-Depends: debhelper (>= 9.20120115)
+Standards-Version: 3.9.4
+Homepage: http://antix.mepis.org
+
+Package: inxi-gui-antix
+Architecture: all
+Depends: yad, gksu, smxi-inxi-antix
+Description: Simple gui front end to inxi script for antiX.

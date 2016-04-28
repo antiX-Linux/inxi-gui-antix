@@ -1,0 +1,178 @@
+inxi-gui-antix (0.3.0) unstable; urgency=low
+ 
+  * New script
+
+ -- anticapitalista <antiX@operamail.com>  Wed, 03 Feb 2016 15:20:00 +0200
+
+
+inxi-gui-antix (0.2.9) unstable; urgency=low
+ 
+  * Added Italian, updated German
+
+ -- anticapitalista <antiX@operamail.com>  Mon, 29 Jun 2015 14:28:00 +0200
+
+
+inxi-gui-antix (0.2.8) unstable; urgency=low
+ 
+  * Fixed broken path for /etc/apt/sources.d *.list files.
+
+ -- anticapitalista <antiX@operamail.com>  Wed, 03 Apr 2015 18:08:00 +0200
+
+
+inxi-gui-antix (0.2.7) unstable; urgency=low
+ 
+  * Use gksu instead of ktsuss, geany instead of leafpad to open all *.list files.
+
+ -- anticapitalista <antiX@operamail.com>  Wed, 25 Mar 2015 12:29:00 +0200
+
+
+inxi-gui-antix (0.2.6) unstable; urgency=low
+ 
+  * Corrected .desktop icon path
+
+ -- anticapitalista <antiX@operamail.com>  Mon, 02 Jan 2015 18:33:00 +0200
+
+
+inxi-gui-antix (0.2.5) unstable; urgency=low
+ 
+  * New icon theme
+
+ -- anticapitalista <antiX@operamail.com>  Sat, 27 Dec 2014 14:36:00 +0200
+
+
+inxi-gui-antix (0.2.4) unstable; urgency=low
+ 
+  * chnage roxterm to roxterm-gtk2
+
+ -- anticapitalista <antiX@operamail.com>  Sun, 07 July 2014 00:40:00 +0200
+
+
+inxi-gui-antix (0.2.3) unstable; urgency=low
+ 
+  * Added Japanese.
+  * Updated Spanish.
+
+ -- anticapitalista <antiX@operamail.com>  Sat, 14 Jun 2014 12:00:00 +0200
+
+
+inxi-gui-antix (0.2.2) unstable; urgency=low
+ 
+  * Built using dpkg-buildpackage.
+  * xz compressed debs.
+
+ -- anticapitalista <antiX@operamail.com>  Fri, 18 Oct 2013 23:10:00 +0200
+
+
+inxi-gui-antix (0.2.1) unstable; urgency=low
+ 
+  * Added localisations.
+
+ -- anticapitalista <antiX@operamail.com>  Sun, 27 January 2013 23:20:00 +0200
+
+
+inxi-gui-antix (0.2.0) unstable; urgency=low
+ 
+  * ktsuss replaces gksu.
+
+ -- anticapitalista <antiX@operamail.com>  Sat, 13 October 2012 19:40:00 +0200
+
+
+inxi-gui-antix (0.1.4.0) unstable; urgency=low
+ 
+  * Fixed ownership bug.
+
+ -- anticapitalista <antiX@operamail.com>  Sun, 26 August 2012 15:40:00 +0200
+
+
+inxi-gui-antix (0.1.3.9) unstable; urgency=low
+ 
+  * Removed inxi script into new smxi-inxi-antix package.
+
+ -- anticapitalista <antiX@operamail.com> Mon, 23 July 2012 13:20:00 +0200
+
+
+inxi-gui-antix (0.1.3.8) unstable; urgency=low
+ 
+  * Added copyright notice.
+
+ -- anticapitalista <antiX@operamail.com> Mon, 16 July 2012 15:30:00 +0200
+
+
+inxi-gui-antix (0.1.3.7) unstable; urgency=low 
+ 
+  * Altered for /bin/bash.
+
+ -- anticapitalista <antiX@operamail.com>  Tues, 10 July 2012 18:47:00 +0200
+
+
+inxi-gui-antix (0.1.3.6) unstable; urgency=low 
+ 
+  * Updated inxi to 1.8.13.
+  * Added 'standard' option to inxi-gui.
+
+ -- anticapitalista <antiX@operamail.com>  Mon, 02 July 2012 12:47:00 +0200
+
+
+inxi-gui-antix (0.1.3.5) unstable; urgency=low 
+ 
+  * Updated inxi to 1.8.5.
+
+ -- anticapitalista <antiX@operamail.com>  Sat, 02 June 2012 23:09:00 +0200
+
+
+inxi-gui-antix (0.1.3.4) unstable; urgency=low 
+ 
+  * Updated inxi to 1.8.4.
+  * Added inxi man page.
+
+ -- anticapitalista <antiX@operamail.com>  Tue, 15 May 2012 19:09:00 +0200
+
+
+inxi-gui-antix (0.1.3.3) unstable; urgency=low 
+ 
+  * Updated inxi to 1.7.36.
+
+ -- anticapitalista <antiX@operamail.com>  Fri, 27 April 2012 20:50:00 +0200
+
+
+inxi-gui-antix (0.1.3.2) unstable; urgency=low 
+ 
+  * Added localisation.
+
+ -- anticapitalista <antiX@operamail.com>  Wed, 25 April 2012 16:50:00 +0200
+
+
+inxi-gui-antix (0.1.3.1) unstable; urgency=low 
+ 
+  * Updated inxi to 1.7.33.
+
+ -- anticapitalista <antiX@operamail.com>  Wed, 18 April 2012 14:50:00 +0200
+
+
+inxi-gui-antix (0.1.3) unstable; urgency=low 
+ 
+  * Updated inxi to 1.7.31.
+
+ -- anticapitalista <antiX@operamail.com>  Mon, 02 April 2012 14:50:00 +0200
+
+
+inxi-gui-antix (0.1.2) unstable; urgency=low 
+ 
+  * Updated inxi to 1.7.30.
+
+ -- anticapitalista <antiX@operamail.com>  Wed, 22 February 2012 17:50:00 +0200
+
+
+inxi-gui-antix (0.1.1) unstable; urgency=low 
+ 
+  * Updated inxi to 1.7.28.
+
+ -- anticapitalista <antiX@operamail.com>  Sat, 28 January 2012 19:30:00 +0200
+
+
+inxi-gui-antix (0.1.0) unstable; urgency=low 
+ 
+  * Initial Release.
+
+ -- anticapitalista <antiX@operamail.com>  Sun, 20 November 2011 15:30:00 +0200
+

@@ -1,0 +1,417 @@
+#! /bin/bash
+#--------------------------------------------------------------------------------------------------------
+# Info tool by Misko_2083
+#
+# modified by kmathern to use yad
+#--------------------------------------------------------------------------------------------------------
+
+#inxi installed?
+if [ -z "$(which inxi)"  ]; then
+
+   if yad --center --title="Question" --question text="Inxi is not installed, do you want to install it?\nIf you choose No program will exit."
+   then
+      gksudo "sudo apt-get install inxi -y" | yad --center --progress --title="Installing inxi" --text="please wait" --pulsate --auto-close
+            if [ "${PIPESTATUS[0]}" -ne "0" ]; then
+               yad --center --error --title="Error" --text="inxi could not be installed."
+               exit
+            fi
+   else
+      exit
+   fi
+fi
+
+disk_df=(FALSE "Fs disk space info" "df -Th | grep /dev/sd" "View filesystem disk space usage")
+
+FDISK=(FALSE "List Partition Tables" "sudo fdisk -l" "List out the partition information (password required)")
+
+BLOCKDEV=(FALSE "Display Block Devices" "lsblk" "List out information of all block devices")
+
+PARTED=(FALSE "List Partition Layout" "sudo parted -l" "List partition layout on all block devices")
+
+lspci_info=(FALSE "PCI info" "lspci -vnn" "View PCI devices info")
+
+lspci_graph=(FALSE "Graphics" "lspci -vnn | grep VGA -A 12" "View graphics devices info")
+
+lsusb_info=(FALSE "USB info" "lsusb" "View usb devices info")
+
+CPU=(FALSE "32/64 bit CPU" "egrep -c \ lm\  /proc/cpuinfo" "Find out is this 32 or 64 bit CPU")
+
+CPUZ=(FALSE "Processor info" "lscpu" "Display detailed info on CPU")
+
+OS=(FALSE "32/64 bit OS" "uname -a" "Find out is this 32 or 64 bit OS")
+
+inxi_full=(FALSE "Full info" "inxi -Fxz" "View system info")
+
+inxi_df=(FALSE "Partition info" "inxi -plu" "View partition info")
+
+REPOS=(FALSE "View Repositories" "inxi -r" "View repositories on this system")
+
+GRAPHICS=(FALSE "View Graphics" "inxi -Gxx" "View graphics on this system")
+
+AUDIO=(FALSE "View Audio" "inxi -A" "View audio on this system")
+
+NETWORK=(FALSE "View Network" "inxi -nz" "View network on this system")
+
+NETWORKC=(FALSE "Network Configuration" "ifconfig -a" "View network  configuration on this system")
+
+OPENGL=(FALSE "View OpenGL configuration" "glxinfo | grep OpenGL" "View OpenGL configuration on this system")
+
+LSB=(FALSE "View lsb release" "lsb_release -dic" "View lsb release info")
+
+function_disk_df(){
+   SOME_TEXT="df - View file system disk space usage\nYou can select the mount to open in the file manager"
+   SOME_TITLE="df"
+
+   df -h -T| tail -n+2 | while read fs type size used rest target; do
+      if [[ $rest ]] ; then
+         echo "$fs" "$type" "$size"B "$used"B "$rest"B "${target[@]}" |  grep /dev/sd | # remove "grep /dev/sd |" to show all
+         awk '{print $1,"\n",$2,"\n",$3,"\n",$4,"\n",$5,"\n",$6}BEGIN{ s = 7; e = 35; }{for (i=s; i<=e; i++) printf("%s%s", $(i), i<e ? OFS : "\n"); }' #Workaround for disk labels that contain whitespaces(number of characters that can be divided by whitespace =e-s)
+      fi
+   #done | sed -e 's/[ \t]*$//' $1|yad --center --list --width=685 --height=350 --title="${SOME_TITLE}" --text="${SOME_TEXT}" --column="Device" --column="Type" --column="Size" --column="Used" --column="Free" --column="%Used" --column="Mount" --print-column="7"| cut -d '|' -f1| tee /tmp/tempdf
+
+   #With radiolist is also an option
+   done | sed -e 's/[ \t]*$//' $1| sed 's!^/dev/sd*!FALSE\n/dev/sd!g' | yad --center --list --radiolist --width=685 --height=350 --title="${SOME_TITLE}" --text="${SOME_TEXT}" --column="Select" --column="FS" --column="Type" --column="Size" --column="Used" --column="Free" --column="%Used" --column="Mount" --print-column="8"| cut -d '|' -f1| tee /tmp/tempdf
+   if [ -z "$(cat /tmp/tempdf)" ]; then
+   rm -f /tmp/tempdf
+   #exit 0
+   return
+   fi
+   xdg-open "$(cat /tmp/tempdf)"
+   rm -f /tmp/tempdf
+}
+
+function_FDISK(){
+   gksudo --message 'To run this tool your password is required. Enter your password (user password), or press Cancel.' 'sudo fdisk -l' | tee /tmp/fdiskinfo| yad --center --title="Partition Tables (sudo fdisk -l)" --text-info --width=800 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/fdiskinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --confirm-overwrite --filename="Partition_Tables.txt" --title="Save List of the Partition Tables")")
+      echo -n "$zNewData" > "$zSavePath"      
+   fi
+      rm /tmp/fdiskinfo
+}
+
+function_BLOCKDEV(){
+   lsblk  |tee /tmp/lsblkinfo | yad --center --title="Block Devices (lsblk)" --text-info --width=800 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/lsblkinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Block_Devices.txt" --title="Save Block Devices info")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/lsblkinfo
+}
+
+function_PARTED(){
+   gksudo --message 'To run this tool your password is required. Enter your password (user password), or press Cancel.' 'sudo parted -l'|tee /tmp/partedinfo | yad --center --title="Partition Layout (sudo parted -l)" --text-info --width=800 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/partedinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Partition_layout.txt" --title="Save Partition Layout info")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/partedinfo
+}
+
+function_lspci_info(){
+   lspci -vnn | tee /tmp/lspciinfo | yad --center --title="PCI info (lspci -vnn)" --text-info --width=800 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/lspciinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="PCI_Devices.txt" --title="Save PCI Devices info")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/lspciinfo
+}
+
+function_lspci_graph(){
+   lspci -vnn | grep VGA -A 12 | tee /tmp/lspcigraph| yad --center --title="Graphics (lspci -vnn | grep VGA -A 12)" --text-info --width=800 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[3]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/lspcigraph)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Graphics_info.txt" --title="Save Graphics info")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/lspcigraph
+}
+
+function_lsusb_info(){
+   lsusb | tee /tmp/lsusbinfo | yad --center --title="USB info (lsusb)" --text-info --width=800 --height=400 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/lsusbinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="USB_info.txt" --title="Save USB info")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/lsusbinfo
+}
+
+function_CPU(){
+   if [ "$(egrep -c ' lm ' /proc/cpuinfo)" -lt "1" ]; then
+      bus_zen="32"
+   else
+      bus_zen="64"
+   fi
+      yad --center --title="32/64 bit CPU" --info --text="This is $bus_zen bit CPU"
+}
+
+function_CPUZ(){
+   lscpu | tee /tmp/processorinfo | yad --center --title="Processor info (lscpu)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/processorinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="CPU_info.txt" --title="Save Processor info")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/processorinfo
+}
+
+function_OS(){
+   if [ "$(uname -a | egrep -c 'i386|i486|i586|i686')" -eq "1" ]; then
+      os_zen="32"
+   else
+      os_zen="64"
+   fi
+      yad --center --title="32/64 bit OS" --info --text="This is $os_zen bit OS"
+}
+
+function_inxi_full(){
+   inxi -Fxz -c 0 | tee /tmp/inxifull | yad --center --title="Full info (inxi -Fxz)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/inxifull)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Full_info.txt" --title="Save Full Computer info")")
+      echo -n "$zNewData" > "$zSavePath"
+   
+   fi
+      rm /tmp/inxifull
+}
+
+function_inxi_df(){
+   inxi -plu -c 0 | tee /tmp/partitionsinfo| yad --center --title="Partition info (inxi -plu)" --text-info --width=650 --height=400 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/partitionsinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Partition_info.txt" --title="Save Partition info")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/partitionsinfo
+}
+
+function_REPOS(){
+   inxi -r -c 0 | tee /tmp/repositorieslist | yad --center --title="Repositories (inxi -r)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/repositorieslist)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Repositories.txt" --title="Save List Of The Repositories")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/repositorieslist
+}
+
+function_GRAPHICS(){
+   inxi -Gxx -c 0 | tee /tmp/graphicsinfo | yad --center --title="Graphics info (inxi -Gxx)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/graphicsinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Graphics_inxi.txt" --title="Save Graphic information (inxi)")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/graphicsinfo
+}
+
+function_AUDIO(){
+   inxi -A -c 0 | tee /tmp/audioinfo | yad --center --title="Audio info (inxi -A)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/audioinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Audio_info.txt" --title="Save Audio information (inxi)")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/audioinfo
+}
+
+function_NETWORK(){
+   inxi -nz -c 0 | tee /tmp/networkinfo | yad --center --title="Network info (inxi -nz)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/networkinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Network_inxi.txt" --title="Save Network information (inxi)")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/networkinfo
+}
+
+function_NETWORKC(){
+   ifconfig -a | tee /tmp/networkconfinfo | yad --center --title="Network info (ifconfig -a)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/networkconfinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Network_conf.txt" --title="Save Network Configuration Info")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/networkconfinfo
+}
+
+function_OPENGL(){
+   glxinfo | grep OpenGL | tee /tmp/openglinfo | yad --center --title="View OpenGL configuration (glxinfo | grep OpenGL)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[3]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/openglinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="OpenGL_info.txt" --title="Save OpenGL Info")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/openglinfo
+}
+
+function_LSB(){
+   lsb_release -dic| tee /tmp/lsbinfo | yad --center --title="View lsb release (lsb_release -dic)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   if [ "${PIPESTATUS[2]}" -ne "1" ]; then
+      zNewData=$(cat /tmp/lsbinfo)
+      zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Network_conf.txt" --title="Save ls_ release Info")")
+      echo -n "$zNewData" > "$zSavePath"
+   fi
+      rm /tmp/lsbinfo
+}
+
+function_nothing(){
+   yad --center --info --width=200 --height=50 --title='Info' --text='Nothing was selected.' --button gtk-clear:0
+}
+
+redraw_main_window="1"
+while [ $redraw_main_window == "1" ]; do
+  redraw_main_window="0"
+  selection=$(yad \
+  --center \
+  --width=900 \
+  --height=700 \
+  --text="Select the info tool you wish to use, then click the OK button." \
+  --title="Info" \
+  --button gtk-ok:0 \
+  --button gtk-quit:1 \
+  --list \
+    --radiolist \
+    --column="Select" \
+    --column="Name" \
+    --column="Command" \
+    --column="Description" \
+    "${disk_df[@]}" \
+    "${FDISK[@]}" \
+    "${BLOCKDEV[@]}" \
+    "${PARTED[@]}" \
+    "${lspci_info[@]}" \
+    "${lspci_graph[@]}" \
+    "${lsusb_info[@]}" \
+    "${CPU[@]}" \
+    "${CPUZ[@]}" \
+    "${OS[@]}" \
+    "${inxi_full[@]}" \
+    "${inxi_df[@]}" \
+    "${REPOS[@]}" \
+    "${GRAPHICS[@]}" \
+    "${AUDIO[@]}" \
+    "${NETWORK[@]}" \
+    "${NETWORKC[@]}" \
+    "${OPENGL[@]}" \
+    "${LSB[@]}" )
+
+  if [ "$?" -eq 0 ];
+    then
+      if [ "${selection[@]}" == "" ]
+        then
+          function_nothing
+          redraw_main_window="1"
+        else
+          :
+      fi
+    else
+      exit 0
+  fi 
+
+  while [ "${selection[@]}" != "" ] ; do
+
+    case $(cut -f2 -d'|' <<<"${selection[@]}") in
+
+          ${disk_df[1]}) function_disk_df
+                         selection='' 
+                         redraw_main_window="1"
+                         ;;
+
+            ${FDISK[1]}) function_FDISK
+                         selection=''
+                         redraw_main_window="1" 
+                         ;;
+
+         ${BLOCKDEV[1]}) function_BLOCKDEV
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+           ${PARTED[1]}) function_PARTED
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+       ${lspci_info[1]}) function_lspci_info
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+      ${lspci_graph[1]}) function_lspci_graph
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+       ${lsusb_info[1]}) function_lsusb_info
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+              ${CPU[1]}) function_CPU
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+             ${CPUZ[1]}) function_CPUZ
+                         selection=''
+                         redraw_main_window="1"
+                         ;; 
+
+               ${OS[1]}) function_OS
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+        ${inxi_full[1]}) function_inxi_full
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+          ${inxi_df[1]}) function_inxi_df
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+            ${REPOS[1]}) function_REPOS
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+ 
+         ${GRAPHICS[1]}) function_GRAPHICS
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+            ${AUDIO[1]}) function_AUDIO
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+          ${NETWORK[1]}) function_NETWORK
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+         ${NETWORKC[1]}) function_NETWORKC
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+           ${OPENGL[1]}) function_OPENGL
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+
+              ${LSB[1]}) function_LSB
+                         selection=''
+                         redraw_main_window="1"
+                         ;;
+  esac
+  sleep 1
+  done
+done
