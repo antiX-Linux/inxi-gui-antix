@@ -230,7 +230,7 @@ function_NETWORK(){
 }
 
 function_NETWORKC(){
-   ifconfig -a | tee /tmp/networkconfinfo | yad --center --title="Network info (ifconfig -a)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
+   /sbin/ifconfig -a | tee /tmp/networkconfinfo | yad --center --title="Network info (ifconfig -a)" --text-info --width=850 --height=600 --button gtk-save:0 --button gtk-cancel:1
    if [ "${PIPESTATUS[2]}" -ne "1" ]; then
       zNewData=$(cat /tmp/networkconfinfo)
       zSavePath=$(echo -n "$(yad --center --file-selection --save --button gtk-save:0 --button gtk-cancel:1 --confirm-overwrite --filename="Network_conf.txt" --title="Save Network Configuration Info")")

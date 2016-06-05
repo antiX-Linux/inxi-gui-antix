@@ -1,3 +1,15 @@
+inxi-gui-antix (0.3.1.1) unstable; urgency=medium
+
+  * Really fix /sbin/ifconfig -a! 
+
+ -- anticapitalista <antix@operamail.com>  Sun, 05 Jun 2016 16:13:12 +0300
+
+inxi-gui-antix (0.3.1) unstable; urgency=medium
+
+  * Fixed  ifconfig -a - needs /sbin/ifconfig -a 
+
+ -- anticapitalista <antix@operamail.com>  Sat, 04 Jun 2016 21:50:46 +0300
+
 inxi-gui-antix (0.3.0) unstable; urgency=low
  
   * New script
