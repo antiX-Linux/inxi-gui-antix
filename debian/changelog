@@ -1,3 +1,9 @@
+inxi-gui-antix (0.3.3) unstable; urgency=medium
+
+  * added lt, pt, ru, sk and sv
+
+ -- anticapitalista <antix@operamail.com>  Fri, 02 Mar 2018 19:52:32 +0200
+
 inxi-gui-antix (0.3.2) unstable; urgency=medium
 
   * Show in Applications menu

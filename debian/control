@@ -3,7 +3,7 @@ Section: system
 Priority: optional
 Maintainer: anticapitalista <antix@operamail.com>
 Build-Depends: debhelper (>= 9.20120115)
-Standards-Version: 3.9.4
+Standards-Version: 3.9.8
 Homepage: http://antix.mepis.org
 
 Package: inxi-gui-antix

@@ -1,6 +1,27 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=PC Information
+Name[am]=የ ኮምፒዩተር መረጃ
+Name[ca]=Informació del PC
+Name[de]=PC Information
+Name[el]=PC Information
+Name[es]=Información del PC
+Name[fr]=Informations du PC
+Name[it]=Informazioni sul PC
+Name[nl]=PC Informatie
+Name[pt]=Informação do computador
+Name[sv]=PC Information
+Comment=Use inxi to show PC information
+Comment[am]=ይጠቀሙ inxi የ ኮምፒዩተር መረጃ ለማየት
+Comment[ca]=Usa inxi per mostrar la informació del PC
+Comment[de]=benutzt inxi zur Anzeige wichtiger Informationen über den PC
+Comment[el]=Πληροφοριών PC μέσω inxi
+Comment[es]=Utiliza inxi para mostrar información del PC
+Comment[fr]=Utiliser inxi pour afficher les informations du PC
+Comment[it]=Utilizza inxi per avere informazioni sul PC
+Comment[nl]=Gebruik inxi om PC informatie te laten zien
+Comment[pt]=rUsar o inxi para mostrar a informação do computador
+Comment[sv]=Använd inxi för att visa PC information
 Exec=inxi-gui
 Icon=computer
 Terminal=false
