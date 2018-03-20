@@ -1,3 +1,9 @@
+inxi-gui-antix (0.3.4) unstable; urgency=medium
+
+  * changed inxi Full to read inxi -zv8
+
+ -- anticapitalista <antix@operamail.com>  Tue, 20 Mar 2018 14:02:34 +0200
+
 inxi-gui-antix (0.3.3) unstable; urgency=medium
 
   * added lt, pt, ru, sk and sv
